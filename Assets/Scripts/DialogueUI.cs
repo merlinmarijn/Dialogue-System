@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class DialogueUI : MonoBehaviour
@@ -8,7 +9,9 @@ public class DialogueUI : MonoBehaviour
     public TextMeshProUGUI TestText;
     public float TimeToCompletion = 1f;
     public Dialogue dialogue;
-    public TextMeshProUGUI[] buttons;
+    public GameObject ButtonPrefab;
+    public GameObject ButtonParent;
+    public List<TextMeshProUGUI> buttons;
     public bool InstantText;
     // Start is called before the first frame update
     void Start()
@@ -18,23 +21,18 @@ public class DialogueUI : MonoBehaviour
 
     public void SelectDialoguePath(int Path)
     {
-        switch (Path)
-        {
-            case 0:
-                dialogue = dialogue.Option1Object ?? dialogue;
-                break;
-            case 1:
-                dialogue = dialogue.Option2Object ?? dialogue;
-                break;
-            case 2:
-                dialogue = dialogue.Option3Object ?? dialogue;
-                break;
-        }
+        Debug.Log(Path);
+        dialogue = dialogue.OptionsObjects[Path] ?? dialogue;
         StartCoroutine(test());
     }
 
     IEnumerator test()
     {
+        foreach (TextMeshProUGUI item in buttons)
+        {
+            Destroy(item.transform.parent.gameObject);
+        }
+        buttons.Clear();
         TestText.text = null;
         foreach(TextMeshProUGUI item in buttons)
         {
@@ -54,8 +52,16 @@ public class DialogueUI : MonoBehaviour
         {
             TestText.text = dialogue.DialogueText;
         }
-        buttons[0].text = dialogue.Option1;
-        buttons[1].text = dialogue.Option2;
-        buttons[2].text = dialogue.Option3;
+        for(int i = 0; i < dialogue.Responses.Length; i++)
+        {
+            Debug.Log("create");
+            buttons.Add(Instantiate(ButtonPrefab, ButtonParent.transform).GetComponentInChildren<TextMeshProUGUI>());
+            buttons[i].text = dialogue.Responses[i];
+            //buttons[i].GetComponentInParent<Button>().onClick.AddListener(() => SelectDialoguePath(i));
+        }
+        foreach(TextMeshProUGUI item in buttons)
+        {
+            item.GetComponentInParent<Button>().onClick.AddListener(() => SelectDialoguePath(buttons.IndexOf(item)));
+        }
     }
 }

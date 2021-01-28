@@ -10,6 +10,7 @@ using System.IO;
 public class DialogueEditor : Editor
 {
 
+
     //Dialogue dialogue;
     public override void OnInspectorGUI()
     {
@@ -18,33 +19,91 @@ public class DialogueEditor : Editor
         EditorGUILayout.LabelField("Dialogue Text");
         dialogue.DialogueText = EditorGUILayout.TextField(dialogue.DialogueText, GUILayout.Width(300), GUILayout.Height(100));
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Dialogue Option 1");
-        EditorGUILayout.BeginHorizontal();
-        dialogue.Option1 = EditorGUILayout.TextField("", dialogue.Option1);
-        dialogue.Option1Object = EditorGUILayout.ObjectField("", dialogue.Option1Object, typeof(Dialogue), true) as Dialogue;
-        EditorGUILayout.EndHorizontal();
-        if (GUILayout.Button("Create Dialogue")&& dialogue.Option1Object == null)
+
+        SerializedProperty options = serializedObject.FindProperty("OptionsObjects");
+        SerializedProperty response = serializedObject.FindProperty("Responses");
+        EditorGUI.BeginChangeCheck();
+        EditorGUILayout.PropertyField(options, true);
+        EditorGUILayout.PropertyField(response, true);
+        if (GUILayout.Button("Create Dialogue Options"))
         {
-            dialogue.Option1Object = dialogue.Option1Object = CreateDialogue();
+            options.arraySize++;
+                SerializedProperty OptionIndex = options.GetArrayElementAtIndex(options.arraySize-1);
+                    OptionIndex.objectReferenceValue = CreateDialogue();
+            response.arraySize++;
+            SerializedProperty ResponseIndex = response.GetArrayElementAtIndex(response.arraySize - 1);
+            ResponseIndex.stringValue = null;
         }
-        EditorGUILayout.LabelField("Dialogue Option 2");
-        EditorGUILayout.BeginHorizontal();
-        dialogue.Option2 = EditorGUILayout.TextField("", dialogue.Option2);
-        dialogue.Option2Object = EditorGUILayout.ObjectField("", dialogue.Option2Object, typeof(Dialogue), true) as Dialogue;
-        EditorGUILayout.EndHorizontal();
-        if (GUILayout.Button("Create Dialogue")&& dialogue.Option2Object == null)
+        if (GUILayout.Button("Create Empty Dialogue Options"))
         {
-            dialogue.Option2Object = dialogue.Option2Object = CreateDialogue();
+            options.arraySize++;
+            SerializedProperty OptionIndex = options.GetArrayElementAtIndex(options.arraySize - 1);
+            OptionIndex.objectReferenceValue = null;
+            response.arraySize++;
+            SerializedProperty ResponseIndex = response.GetArrayElementAtIndex(response.arraySize - 1);
+            ResponseIndex.stringValue = null;
         }
-        EditorGUILayout.LabelField("Dialogue Option 3");
-        EditorGUILayout.BeginHorizontal();
-        dialogue.Option3 = EditorGUILayout.TextField("", dialogue.Option3);
-        dialogue.Option3Object = EditorGUILayout.ObjectField("", dialogue.Option3Object, typeof(Dialogue), true) as Dialogue;
-        EditorGUILayout.EndHorizontal();
-        if (GUILayout.Button("Create Dialogue")&& dialogue.Option3Object == null)
+        if (GUILayout.Button("Remove Last Dialogue Options"))
         {
-            dialogue.Option3Object = dialogue.Option3Object = CreateDialogue();
+            if (options.GetArrayElementAtIndex(options.arraySize - 1).objectReferenceValue != null)
+            {
+                DeleteDialogue(options.GetArrayElementAtIndex(options.arraySize - 1).objectReferenceValue.name);
+                options.arraySize--;
+                response.arraySize--;
+            } else
+            {
+                options.arraySize--;
+                response.arraySize--;
+            }
         }
+        if (EditorGUI.EndChangeCheck())
+            serializedObject.ApplyModifiedProperties();
+        EditorGUIUtility.LookLikeControls();
+
+
+        //SerializedProperty response = serializedObject.FindProperty("Responses");
+        //EditorGUI.BeginChangeCheck();
+        //EditorGUILayout.PropertyField(response, true);
+        //if (EditorGUI.EndChangeCheck())
+        //    serializedObject.ApplyModifiedProperties();
+        //EditorGUIUtility.LookLikeControls();
+
+
+
+
+
+        //OLD SYSTEM
+
+        //EditorGUILayout.Space();
+        //EditorGUILayout.LabelField("Dialogue Option 1");
+        //EditorGUILayout.BeginHorizontal();
+        //dialogue.Option1 = EditorGUILayout.TextField("", dialogue.Option1);
+        //dialogue.Option1Object = EditorGUILayout.ObjectField("", dialogue.Option1Object, typeof(Dialogue), true) as Dialogue;
+        //EditorGUILayout.EndHorizontal();
+        //if (GUILayout.Button("Create Dialogue")&& dialogue.Option1Object == null)
+        //{
+        //    dialogue.Option1Object = dialogue.Option1Object = CreateDialogue();
+        //}
+
+        ////OLD REMOVE AFTER REWRITE OF CODE
+        //EditorGUILayout.LabelField("Dialogue Option 2");
+        //EditorGUILayout.BeginHorizontal();
+        //dialogue.Option2 = EditorGUILayout.TextField("", dialogue.Option2);
+        //dialogue.Option2Object = EditorGUILayout.ObjectField("", dialogue.Option2Object, typeof(Dialogue), true) as Dialogue;
+        //EditorGUILayout.EndHorizontal();
+        //if (GUILayout.Button("Create Dialogue") && dialogue.Option2Object == null)
+        //{
+        //    dialogue.Option2Object = dialogue.Option2Object = CreateDialogue();
+        //}
+        //EditorGUILayout.LabelField("Dialogue Option 3");
+        //EditorGUILayout.BeginHorizontal();
+        //dialogue.Option3 = EditorGUILayout.TextField("", dialogue.Option3);
+        //dialogue.Option3Object = EditorGUILayout.ObjectField("", dialogue.Option3Object, typeof(Dialogue), true) as Dialogue;
+        //EditorGUILayout.EndHorizontal();
+        //if (GUILayout.Button("Create Dialogue") && dialogue.Option3Object == null)
+        //{
+        //    dialogue.Option3Object = dialogue.Option3Object = CreateDialogue();
+        //}
     }
 
 
@@ -68,4 +127,13 @@ public class DialogueEditor : Editor
         return asset;
     }
 
+    void DeleteDialogue(string file)
+    {
+        string AssetFolderPath = Application.dataPath;
+        string DialogueFolderPath = AssetFolderPath + "/ScriptableObjects/Dialogue_Sequence_1/";
+        Debug.Log(DialogueFolderPath + file + ".asset");
+        File.Delete(DialogueFolderPath + file + ".asset");
+        AssetDatabase.DeleteAsset(DialogueFolderPath +file+".asset");
+
+    }
 }

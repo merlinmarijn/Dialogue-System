@@ -10,12 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 02f646e06ec8a14468fcf6d92d193942, type: 3}
-  m_Name: 1_Dialogue
+  m_Name: 4_Dialogue
   m_EditorClassIdentifier: 
-  DialogueText: Hello how are you?
-  OptionsObjects:
-  - {fileID: 11400000, guid: d55e4fd63e513d54790faffd9ba1a345, type: 2}
-  - {fileID: 11400000, guid: 56267de0668acb84fb2e38243649950f, type: 2}
-  Responses:
-  - 
-  - 
+  DialogueText: 
+  OptionsObjects: []
+  Responses: []

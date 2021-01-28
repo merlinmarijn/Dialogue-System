@@ -13,9 +13,5 @@ MonoBehaviour:
   m_Name: 2_Dialogue
   m_EditorClassIdentifier: 
   DialogueText: 
-  Option1: 
-  Option1Object: {fileID: 0}
-  Option2: 
-  Option2Object: {fileID: 0}
-  Option3: 
-  Option3Object: {fileID: 0}
+  OptionsObjects: []
+  Responses: []
